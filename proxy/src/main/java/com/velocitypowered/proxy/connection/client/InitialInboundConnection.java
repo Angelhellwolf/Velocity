@@ -110,10 +110,24 @@ public final class InitialInboundConnection implements VelocityInboundConnection
    * @param reason the reason for disconnecting
    */
   public void disconnect(Component reason) {
+    disconnect(reason, true);
+  }
+
+  /**
+   * Disconnects the connection from the server.
+   *
+   * @param reason the reason for disconnecting
+   * @param logReason whether to include the disconnect reason in player connection logs
+   */
+  public void disconnect(Component reason, boolean logReason) {
     Component translated = GlobalTranslator.render(reason, ClosestLocaleMatcher.INSTANCE
         .lookupClosest(Locale.getDefault()));
     if (connection.server.getConfiguration().isLogPlayerConnections()) {
-      logger.info(Component.text(this + " has disconnected: ").append(translated));
+      if (logReason) {
+        logger.info(Component.text(this + " has disconnected: ").append(translated));
+      } else {
+        logger.info("{} has disconnected during login", this);
+      }
     }
     connection.closeWith(DisconnectPacket.create(translated, getProtocolVersion(), connection.getState()));
   }

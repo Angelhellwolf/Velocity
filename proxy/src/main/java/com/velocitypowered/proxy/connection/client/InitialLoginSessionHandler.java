@@ -131,7 +131,7 @@ public class InitialLoginSessionHandler implements MinecraftSessionHandler {
       Optional<Component> disconnectReason = result.getReasonComponent();
       if (disconnectReason.isPresent()) {
         // The component is guaranteed to be provided if the connection was denied.
-        inbound.disconnect(disconnectReason.get());
+        inbound.disconnect(disconnectReason.get(), false);
         return;
       }
 

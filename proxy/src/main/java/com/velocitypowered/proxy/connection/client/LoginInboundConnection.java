@@ -126,6 +126,17 @@ public class LoginInboundConnection implements LoginPhaseConnection, KeyIdentifi
     this.cleanup();
   }
 
+  /**
+   * Disconnects the connection from the server.
+   *
+   * @param reason the reason for disconnecting
+   * @param logReason whether to include the disconnect reason in player connection logs
+   */
+  public void disconnect(Component reason, boolean logReason) {
+    this.delegate.disconnect(reason, logReason);
+    this.cleanup();
+  }
+
   void cleanup() {
     this.loginMessagesToSend.clear();
     this.outstandingResponses.clear();
