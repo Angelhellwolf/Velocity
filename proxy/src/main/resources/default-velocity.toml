@@ -1,204 +1,188 @@
-# Config version. Do not change this
+# 配置版本，请勿手动修改。
 config-version = "2.8"
 
-# What port should the proxy be bound to? By default, we'll bind to all addresses on port 25565.
+# 代理监听地址。默认监听所有网卡的 25565 端口。
 bind = "0.0.0.0:25565"
 
-# What should be the MOTD? This gets displayed when the player adds your server to
-# their server list. Only MiniMessage format is accepted.
-motd = "<#09add3>A Velocity Server"
+# 服务器列表中显示的 MOTD。仅支持 MiniMessage 格式。
+motd = "<#09add3>一个 Velocity 服务器"
 
-# What should we display for the maximum number of players? (Velocity does not support a cap
-# on the number of players online.)
+# 服务器列表中显示的最大玩家数。Velocity 本身不会限制在线人数上限。
 show-max-players = 500
 
-# Should we authenticate players with Mojang? By default, this is on.
+# 是否通过 Mojang 正版验证玩家。默认开启。
 online-mode = true
 
-# Should the proxy enforce the new public key security standard? By default, this is on.
+# 是否强制使用新版公钥安全验证。默认开启。
 force-key-authentication = true
 
-# If client's ISP/AS sent from this proxy is different from the one from Mojang's
-# authentication server, the player is kicked. This disallows some VPN and proxy
-# connections but is a weak form of protection.
+# 如果客户端经由本代理上报的 ISP/AS 与 Mojang 验证服务器看到的不一致，
+# 将拒绝玩家连接。可阻止部分 VPN/代理连接，但这只是较弱的保护。
 prevent-client-proxy-connections = false
 
-# Should we forward IP addresses and other data to backend servers?
-# Available options:
-# - "none":        No forwarding will be done. All players will appear to be connecting
-#                  from the proxy and will have offline-mode UUIDs.
-# - "legacy":      Forward player IPs and UUIDs in a BungeeCord-compatible format. Use this
-#                  if you run servers using Minecraft 1.12 or lower.
-# - "bungeeguard": Forward player IPs and UUIDs in a format supported by the BungeeGuard
-#                  plugin. Use this if you run servers using Minecraft 1.12 or lower, and are
-#                  unable to implement network level firewalling (on a shared host).
-# - "modern":      Forward player IPs and UUIDs as part of the login process using
-#                  Velocity's native forwarding. Only applicable for Minecraft 1.13 or higher.
+# 是否向后端服务器转发玩家 IP、UUID 等信息。
+# 可选值：
+# - "none":        不转发。所有玩家都会显示为从代理连接，并使用离线 UUID。
+# - "legacy":      以兼容 BungeeCord 的格式转发玩家 IP 和 UUID，适用于 1.12 或更低版本后端。
+# - "bungeeguard": 以 BungeeGuard 插件支持的格式转发玩家 IP 和 UUID。
+#                  适用于共享主机等无法做网络层防火墙的场景。
+# - "modern":      使用 Velocity 原生转发，在登录过程中转发玩家 IP 和 UUID。
+#                  仅适用于 Minecraft 1.13 及更高版本。
 player-info-forwarding-mode = "NONE"
 
-# If you are using modern or BungeeGuard IP forwarding, configure a file that contains a unique secret here.
-# The file is expected to be UTF-8 encoded and not empty.
+# 使用 modern 或 BungeeGuard 转发时，请在这里配置包含唯一密钥的文件。
+# 文件必须为 UTF-8 编码且不能为空。
 forwarding-secret-file = "forwarding.secret"
 
-# Announce whether or not your server supports Forge. If you run a modded server, we
-# suggest turning this on.
-# 
-# If your network runs one modpack consistently, consider using ping-passthrough = "mods"
-# instead for a nicer display in the server list.
+# 是否向客户端声明服务器支持 Forge。如果运行 Mod 服，建议开启。
+#
+# 如果整个网络固定使用同一整合包，也可以考虑设置 ping-passthrough = "mods"，
+# 这样服务器列表展示会更友好。
 announce-forge = false
 
-# If enabled (default is false) and the proxy is in online mode, Velocity will kick
-# any existing player who is online if a duplicate connection attempt is made.
+# 如果开启且代理处于 online-mode，当同一玩家重复连接时，会踢出现有在线玩家。
 kick-existing-players = false
 
-# Should Velocity pass server list ping requests to a backend server?
-# Available options:
-# - "disabled":    No pass-through will be done. The velocity.toml and server-icon.png
-#                  will determine the initial server list ping response.
-# - "mods":        Passes only the mod list from your backend server into the response.
-#                  The first server in your try list (or forced host) with a mod list will be
-#                  used. If no backend servers can be contacted, Velocity won't display any
-#                  mod information.
-# - "description": Uses the description and mod list from the backend server. The first
-#                  server in the try (or forced host) list that responds is used for the
-#                  description and mod list.
-# - "all":         Uses the backend server's response as the proxy response. The Velocity
-#                  configuration is used if no servers could be contacted.
+# 是否将服务器列表 ping 请求透传给后端服务器。
+# 可选值：
+# - "disabled":    不透传，由 velocity.toml 和 server-icon.png 决定返回内容。
+# - "mods":        只从后端服务器响应中透传 Mod 列表。
+#                  会使用 try 列表或 forced-host 中第一个带 Mod 列表的服务器。
+#                  如果无法连接任何后端，则不显示 Mod 信息。
+# - "description": 使用后端服务器的描述和 Mod 列表。
+#                  会使用 try 列表或 forced-host 中第一个有响应的服务器。
+# - "all":         使用后端服务器的完整响应作为代理响应。
+#                  如果无法连接任何后端，则使用 Velocity 配置。
 ping-passthrough = "DISABLED"
 
-# If enabled (default is false), then a sample of the online players on the proxy will be visible
-# when hovering over the player count in the server list.
-# This doesn't have any effect when ping passthrough is set to either "description" or "all".
+# 是否在服务器列表玩家数量悬停提示中显示在线玩家样本。
+# 当 ping-passthrough 设置为 "description" 或 "all" 时，此项无效。
 sample-players-in-ping = false
 
-# If not enabled (default is true) player IP addresses will be replaced by <ip address withheld> in logs
+# 是否在日志中显示玩家 IP。关闭后日志会显示为 <ip address withheld>。
 enable-player-address-logging = true
 
 [packet-limiter]
-# Size of the moving time window in seconds used to calculate average rates.
-# A larger window tolerates short bursts while still enforcing the configured limits over time.
+# 用于计算平均速率的滑动时间窗口，单位为秒。
+# 窗口越大，越能容忍短时间突发，同时仍会按长期平均值限制。
 interval = 7
-# Maximum average number of packets per second a client may send. -1 disables this check.
+
+# 客户端每秒允许发送的平均包数量。设置为 -1 可关闭此检查。
 packets-per-second = -1
-# Maximum average number of compressed (on-wire) bytes per second a client may send. -1 disables this check.
+
+# 客户端每秒允许发送的平均压缩后网络字节数。设置为 -1 可关闭此检查。
 bytes-per-second = -1
-# Maximum average number of decompressed bytes per second a client may send.
-# Protects against compression bomb attacks where small packets expand to excessive sizes after decompression.
-# -1 disables this check.
+
+# 客户端每秒允许发送的平均解压后字节数。
+# 可防御压缩炸弹攻击，避免小包解压后膨胀成过大的数据。
+# 设置为 -1 可关闭此检查。
 decompressed-bytes-per-second = 5242880
 
 [servers]
-# Configure your servers here. Each key represents the server's name, and the value
-# represents the IP address of the server to connect to.
-lobby = "127.0.0.1:30066"
-factions = "127.0.0.1:30067"
-minigames = "127.0.0.1:30068"
+# 在这里配置静态后端服务器。
+# 每个键是服务器名称，值是该服务器的连接地址。
+#
+# 如果你使用插件动态注册服务器，可以保持此节为空，并保留 try = []。
+# 示例：
+# lobby = "127.0.0.1:30066"
 
-# In what order we should try servers when a player logs in or is kicked from a server.
-try = [
-    "lobby"
-]
+# 玩家登录或被后端踢出时，Velocity 自己尝试连接的静态服务器顺序。
+# 使用插件接管路由时建议保持为空，避免默认大厅抢走插件的 Limbo/回退逻辑。
+try = []
 
 [forced-hosts]
-# Configure your forced hosts here.
-"lobby.example.com" = [
-    "lobby"
-]
-"factions.example.com" = [
-    "factions"
-]
-"minigames.example.com" = [
-    "minigames"
-]
+# 在这里配置强制主机名。
+# 访问指定域名的玩家会优先尝试连接对应服务器列表。
+# 使用插件动态注册服务器时可保持为空。
+#
+# 示例：
+# "lobby.example.com" = [
+#     "lobby"
+# ]
 
 [advanced]
-# How large a Minecraft packet has to be before we compress it. Setting this to zero will
-# compress all packets, and setting it to -1 will disable compression entirely.
+# Minecraft 包多大时才进行压缩。
+# 设置为 0 会压缩所有包，设置为 -1 会完全关闭压缩。
 compression-threshold = 256
 
-# How much compression should be done (from 0-9). The default is -1, which uses the
-# default level of 6.
+# 压缩等级，范围 0-9。默认 -1 表示使用默认等级 6。
 compression-level = -1
 
-# How fast (in milliseconds) are clients allowed to connect after the last connection? By
-# default, this is three seconds. Disable this by setting this to 0.
+# 同一客户端两次连接之间的最小间隔，单位毫秒。
+# 默认 3000 毫秒。设置为 0 可关闭此限制。
 login-ratelimit = 3000
 
-# Specify a custom timeout for connection timeouts here. The default is five seconds.
+# 连接后端服务器的超时时间，单位毫秒。默认 5000 毫秒。
 connection-timeout = 5000
 
-# Specify a read timeout for connections here. The default is 30 seconds.
+# 连接读超时时间，单位毫秒。默认 30000 毫秒。
 read-timeout = 30000
 
-# Enables compatibility with HAProxy's PROXY protocol. If you don't know what this is for, then
-# don't enable it.
+# 是否启用 HAProxy PROXY 协议兼容。
+# 如果不知道它的用途，请不要开启。
 haproxy-protocol = false
 
-# Enables TCP fast open support on the proxy. Requires the proxy to run on Linux.
+# 是否启用 TCP Fast Open。要求代理运行在 Linux 上。
 tcp-fast-open = false
 
-# Enables BungeeCord plugin messaging channel support on Velocity.
+# 是否启用 Velocity 对 BungeeCord 插件消息通道的兼容支持。
 bungee-plugin-message-channel = true
 
-# Shows ping requests to the proxy from clients.
+# 是否在控制台显示来自客户端的服务器列表 ping 请求。
 show-ping-requests = false
 
-# By default, Velocity will attempt to gracefully handle situations where the user unexpectedly
-# loses connection to the server without an explicit disconnect message by attempting to fall the
-# user back, except in the case of read timeouts. BungeeCord will disconnect the user instead. You
-# can disable this setting to use the BungeeCord behavior.
+# 当玩家与后端服务器意外断开且没有明确断开消息时，
+# Velocity 默认会尝试把玩家转移到其他回退服务器，读超时除外。
+# 关闭后会采用 BungeeCord 行为，直接断开玩家。
 failover-on-unexpected-server-disconnect = true
 
-# Declares the proxy commands to 1.13+ clients.
+# 是否向 1.13+ 客户端声明代理命令。
 announce-proxy-commands = true
 
-# Enables the logging of commands
+# 是否记录命令执行日志。
 log-command-executions = false
 
-# Enables logging of player connections when connecting to the proxy, switching servers
-# and disconnecting from the proxy.
+# 是否记录玩家连接代理、切换服务器、断开代理的日志。
 log-player-connections = true
 
-# Allows players transferred from other hosts via the
-# Transfer packet (Minecraft 1.20.5) to be received.
+# 是否允许接收通过 Transfer 数据包从其他主机转移来的玩家。
+# 适用于 Minecraft 1.20.5 及更高版本。
 accepts-transfers = false
 
-# Enables support for SO_REUSEPORT. This may help the proxy scale better on multicore systems
-# with a lot of incoming connections, and provide better CPU utilization than the existing
-# strategy of having a single thread accepting connections and distributing them to worker
-# threads. Disabled by default. Requires Linux or macOS.
+# 是否启用 SO_REUSEPORT 支持。
+# 在多核系统和大量连接场景下可能提高扩展性和 CPU 利用率。
+# 默认关闭。要求 Linux 或 macOS。
 enable-reuse-port = false
 
-# How fast (in milliseconds) are clients allowed to send commands after the last command
-# By default this is 50ms (20 commands per second)
+# 客户端发送命令的最小间隔，单位毫秒。
+# 默认 50 毫秒，即每秒 20 条命令。
 command-rate-limit = 50
 
-# Should we forward commands to the backend upon being rate limited?
-# This will forward the command to the server instead of processing it on the proxy.
-# Since most server implementations have a rate limit, this will prevent the player
-# from being able to send excessive commands to the server.
+# 当命令触发限速时，是否仍将命令转发给后端。
+# 开启后会交给后端处理，而不是在代理层处理。
+# 大多数后端也有限速，可避免玩家向后端发送过量命令。
 forward-commands-if-rate-limited = true
 
-# How many commands are allowed to be sent after the rate limit is hit before the player is kicked?
-# Setting this to 0 or lower will disable this feature.
+# 命令触发限速后，允许继续发送多少条命令才踢出玩家。
+# 设置为 0 或更低可关闭此功能。
 kick-after-rate-limited-commands = 0
 
-# How fast (in milliseconds) are clients allowed to send tab completions after the last tab completion
+# 客户端发送 Tab 补全请求的最小间隔，单位毫秒。
 tab-complete-rate-limit = 10
 
-# How many tab completions are allowed to be sent after the rate limit is hit before the player is kicked?
-# Setting this to 0 or lower will disable this feature.
+# Tab 补全触发限速后，允许继续发送多少次补全请求才踢出玩家。
+# 设置为 0 或更低可关闭此功能。
 kick-after-rate-limited-tab-completes = 0
 
 [query]
-# Whether to enable responding to GameSpy 4 query responses or not.
+# 是否启用 GameSpy 4 query 响应。
 enabled = false
 
-# If query is enabled, on what port should the query protocol listen on?
+# query 协议监听端口。
 port = 25565
 
-# This is the map name that is reported to the query services.
+# query 服务报告的地图名称。
 map = "Velocity"
 
-# Whether plugins should be shown in query response by default or not
+# query 响应中默认是否显示插件列表。
 show-plugins = false

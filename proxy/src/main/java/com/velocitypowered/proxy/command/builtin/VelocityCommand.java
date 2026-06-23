@@ -306,17 +306,14 @@ public final class VelocityCommand {
           dumpPath, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW)) {
         bw.write(InformationUtils.toHumanReadableString(dump));
 
-        source.sendMessage(Component.text(
-            "An anonymised report containing useful information about "
-                + "this proxy has been saved at " + dumpPath.toAbsolutePath(),
-            NamedTextColor.GREEN));
+        source.sendMessage(Component.translatable(
+            "velocity.command.dump-local-success", NamedTextColor.GREEN,
+            Argument.string("path", dumpPath.toAbsolutePath().toString())));
       } catch (IOException e) {
         logger.error("Failed to complete dump command, "
             + "the executor was interrupted: " + e.getMessage(), e);
-        source.sendMessage(Component.text(
-            "We could not save the anonymized dump. Check the console for more details.",
-            NamedTextColor.RED)
-        );
+        source.sendMessage(Component.translatable(
+            "velocity.command.dump-local-failure", NamedTextColor.RED));
       }
       return Command.SINGLE_SUCCESS;
     }
@@ -363,7 +360,9 @@ public final class VelocityCommand {
                 // This should not occur
                 throw new RuntimeException(e);
               }
-              src.sendMessage(Component.text("Heap dump saved to " + file, NamedTextColor.GREEN));
+              src.sendMessage(Component.translatable(
+                  "velocity.command.heap-dump-success", NamedTextColor.GREEN,
+                  Argument.string("path", file.toString())));
             };
           } catch (ClassNotFoundException e) {
             Class<?> clazz = Class.forName("com.sun.management.HotSpotDiagnosticMXBean");
@@ -381,15 +380,17 @@ public final class VelocityCommand {
                 // This should not occur
                 throw new RuntimeException(e1);
               }
-              src.sendMessage(Component.text("Heap dump saved to " + file, NamedTextColor.GREEN));
+              src.sendMessage(Component.translatable(
+                  "velocity.command.heap-dump-success", NamedTextColor.GREEN,
+                  Argument.string("path", file.toString())));
             };
           }
         }
 
         this.heapConsumer.accept(source);
       } catch (Throwable t) {
-        source.sendMessage(Component.text("Failed to write heap dump, see server log for details",
-            NamedTextColor.RED));
+        source.sendMessage(Component.translatable(
+            "velocity.command.heap-dump-failure", NamedTextColor.RED));
         logger.error("Could not write heap", t);
       }
       return Command.SINGLE_SUCCESS;

@@ -79,9 +79,7 @@ public class HandshakeSessionHandler implements MinecraftSessionHandler {
   @Override
   public boolean handle(LegacyHandshakePacket packet) {
     connection.closeWith(LegacyDisconnect.from(Component.text(
-        "Your client is extremely old. Please update to a newer version of Minecraft.",
-        NamedTextColor.RED)
-    ));
+        "您的客户端版本过旧，请更新到较新的 Minecraft 版本。", NamedTextColor.RED)));
     return true;
   }
 
