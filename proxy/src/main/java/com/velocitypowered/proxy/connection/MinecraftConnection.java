@@ -190,12 +190,16 @@ public class MinecraftConnection extends ChannelInboundHandlerAdapter {
       }
 
       if (association != null) {
+        boolean frontlineHandler = activeSessionHandler instanceof InitialLoginSessionHandler
+            || activeSessionHandler instanceof HandshakeSessionHandler
+            || activeSessionHandler instanceof StatusSessionHandler;
         if (cause instanceof ReadTimeoutException) {
-          logger.error("{}: read timed out", association);
+          if (frontlineHandler) {
+            knownDisconnect = true;
+          } else {
+            logger.error("{}: read timed out", association);
+          }
         } else {
-          boolean frontlineHandler = activeSessionHandler instanceof InitialLoginSessionHandler
-              || activeSessionHandler instanceof HandshakeSessionHandler
-              || activeSessionHandler instanceof StatusSessionHandler;
           boolean isQuietDecoderException = cause instanceof QuietDecoderException;
           boolean willLog = !isQuietDecoderException && !frontlineHandler;
           if (willLog) {

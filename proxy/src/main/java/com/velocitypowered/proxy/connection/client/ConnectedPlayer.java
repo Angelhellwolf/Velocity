@@ -665,9 +665,7 @@ public class ConnectedPlayer implements MinecraftConnectionAssociation, Player, 
     Component translated = this.translateMessage(reason);
 
     if (server.getConfiguration().isLogPlayerConnections()) {
-      if (duringLogin) {
-        logger.info("{} has disconnected during login", this);
-      } else {
+      if (!duringLogin) {
         logger.info(Component.text(this + " has disconnected: ").append(translated));
       }
     }
