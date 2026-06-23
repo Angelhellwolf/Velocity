@@ -154,6 +154,13 @@ accepts-transfers = false
 # 默认关闭。要求 Linux 或 macOS。
 enable-reuse-port = false
 
+# ServerManager 路由托管模式。
+# 可选值：
+# - "AUTO": 检测到 servermanager 插件时，自动让插件接管初始服和回退路由。
+# - "ON":   安装 servermanager 插件时强制启用托管路由。
+# - "OFF":  始终使用 Velocity 自带的 try/fallback 路由。
+servermanager-routing-mode = "AUTO"
+
 # 客户端发送命令的最小间隔，单位毫秒。
 # 默认 50 毫秒，即每秒 20 条命令。
 command-rate-limit = 50

@@ -411,6 +411,10 @@ public class VelocityConfiguration implements ProxyConfig {
     return samplePlayersInPing;
   }
 
+  public ServerManagerRoutingMode getServerManagerRoutingMode() {
+    return advanced.getServerManagerRoutingMode();
+  }
+
   public boolean isPlayerAddressLoggingEnabled() {
     return enablePlayerAddressLogging;
   }
@@ -779,6 +783,8 @@ public class VelocityConfiguration implements ProxyConfig {
     @Expose
     private boolean enableReusePort = false;
     @Expose
+    private ServerManagerRoutingMode serverManagerRoutingMode = ServerManagerRoutingMode.AUTO;
+    @Expose
     private int commandRateLimit = 50;
     @Expose
     private boolean forwardCommandsIfRateLimited = true;
@@ -814,6 +820,8 @@ public class VelocityConfiguration implements ProxyConfig {
         this.logPlayerConnections = config.getOrElse("log-player-connections", true);
         this.acceptTransfers = config.getOrElse("accepts-transfers", false);
         this.enableReusePort = config.getOrElse("enable-reuse-port", false);
+        this.serverManagerRoutingMode = parseServerManagerRoutingMode(
+            config.getOrElse("servermanager-routing-mode", ServerManagerRoutingMode.AUTO.name()));
         this.commandRateLimit = config.getIntOrElse("command-rate-limit", 25);
         this.forwardCommandsIfRateLimited = config.getOrElse("forward-commands-if-rate-limited", true);
         this.kickAfterRateLimitedCommands = config.getIntOrElse("kick-after-rate-limited-commands", 0);
@@ -886,6 +894,10 @@ public class VelocityConfiguration implements ProxyConfig {
       return enableReusePort;
     }
 
+    public ServerManagerRoutingMode getServerManagerRoutingMode() {
+      return serverManagerRoutingMode;
+    }
+
     public int getCommandRateLimit() {
       return commandRateLimit;
     }
@@ -924,7 +936,16 @@ public class VelocityConfiguration implements ProxyConfig {
           + ", logPlayerConnections=" + logPlayerConnections
           + ", acceptTransfers=" + acceptTransfers
           + ", enableReusePort=" + enableReusePort
+          + ", serverManagerRoutingMode=" + serverManagerRoutingMode
           + '}';
+    }
+
+    private ServerManagerRoutingMode parseServerManagerRoutingMode(String value) {
+      ServerManagerRoutingMode mode = ServerManagerRoutingMode.parse(value);
+      if (value != null && !value.isBlank() && !mode.name().equalsIgnoreCase(value.trim())) {
+        logger.warn("Invalid servermanager-routing-mode '{}', using AUTO.", value);
+      }
+      return mode;
     }
   }
 

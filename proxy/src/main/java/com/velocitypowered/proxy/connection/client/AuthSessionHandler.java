@@ -260,7 +260,9 @@ public class AuthSessionHandler implements MinecraftSessionHandler {
   }
 
   private CompletableFuture<Void> connectToInitialServer(ConnectedPlayer player) {
-    Optional<RegisteredServer> initialFromConfig = player.getNextServerToTry();
+    Optional<RegisteredServer> initialFromConfig = server.isServerManagerRoutingActive()
+        ? Optional.empty()
+        : player.getNextServerToTry();
     PlayerChooseInitialServerEvent event =
         new PlayerChooseInitialServerEvent(player, initialFromConfig.orElse(null));
 

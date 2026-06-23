@@ -47,6 +47,7 @@ import com.velocitypowered.proxy.command.builtin.SendCommand;
 import com.velocitypowered.proxy.command.builtin.ServerCommand;
 import com.velocitypowered.proxy.command.builtin.ShutdownCommand;
 import com.velocitypowered.proxy.command.builtin.VelocityCommand;
+import com.velocitypowered.proxy.config.ServerManagerRoutingMode;
 import com.velocitypowered.proxy.config.VelocityConfiguration;
 import com.velocitypowered.proxy.connection.client.ConnectedPlayer;
 import com.velocitypowered.proxy.connection.player.resourcepack.VelocityResourcePackInfo;
@@ -123,6 +124,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 public class VelocityServer implements ProxyServer, ForwardingAudience {
 
   public static final String VELOCITY_URL = "https://papermc.io/software/velocity";
+  private static final String SERVER_MANAGER_PLUGIN_ID = "servermanager";
 
   private static final Logger logger = LogManager.getLogger(VelocityServer.class);
   public static final Gson GENERAL_GSON = new GsonBuilder()
@@ -816,6 +818,20 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   @Override
   public int getPlayerCount() {
     return connectionsByUuid.size();
+  }
+
+  /**
+   * Checks whether routing should be delegated to ServerManager.
+   *
+   * @return {@code true} if ServerManager is loaded and routing delegation is enabled
+   */
+  public boolean isServerManagerRoutingActive() {
+    if (configuration == null) {
+      return false;
+    }
+    ServerManagerRoutingMode mode = configuration.getServerManagerRoutingMode();
+    return mode != ServerManagerRoutingMode.OFF
+        && pluginManager.isLoaded(SERVER_MANAGER_PLUGIN_ID);
   }
 
   /**
