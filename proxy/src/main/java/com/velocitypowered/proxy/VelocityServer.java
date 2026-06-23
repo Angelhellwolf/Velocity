@@ -36,6 +36,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.player.ResourcePackInfo;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerInfo;
+import com.velocitypowered.api.proxy.server.ServerPing;
 import com.velocitypowered.api.util.Favicon;
 import com.velocitypowered.api.util.GameProfile;
 import com.velocitypowered.api.util.ProxyVersion;
@@ -85,6 +86,7 @@ import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -94,6 +96,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -813,6 +816,38 @@ public class VelocityServer implements ProxyServer, ForwardingAudience {
   @Override
   public int getPlayerCount() {
     return connectionsByUuid.size();
+  }
+
+  /**
+   * Returns a random sample of players for the server list ping response.
+   *
+   * @param limit the maximum number of players to include
+   * @return a random player sample
+   */
+  public List<ServerPing.SamplePlayer> getSamplePlayersForPing(int limit) {
+    if (limit <= 0 || connectionsByUuid.isEmpty()) {
+      return ImmutableList.of();
+    }
+
+    List<ServerPing.SamplePlayer> sample = new ArrayList<>(
+        Math.min(limit, connectionsByUuid.size()));
+    int seen = 0;
+    for (ConnectedPlayer player : connectionsByUuid.values()) {
+      ServerPing.SamplePlayer samplePlayer = player.getPlayerSettings().isClientListingAllowed()
+          ? new ServerPing.SamplePlayer(player.getUsername(), player.getUniqueId())
+          : ServerPing.SamplePlayer.ANONYMOUS;
+      seen++;
+      if (sample.size() < limit) {
+        sample.add(samplePlayer);
+        continue;
+      }
+
+      int replaceIndex = ThreadLocalRandom.current().nextInt(seen);
+      if (replaceIndex < limit) {
+        sample.set(replaceIndex, samplePlayer);
+      }
+    }
+    return ImmutableList.copyOf(sample);
   }
 
   @Override
