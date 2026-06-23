@@ -188,22 +188,22 @@ public class VelocityConfiguration implements ProxyConfig {
 
     for (String s : servers.getAttemptConnectionOrder()) {
       if (!servers.getServers().containsKey(s)) {
-        logger.error("Fallback server " + s + " is not registered in your configuration!");
-        valid = false;
+        logger.warn("Fallback server {} is not registered in your configuration. "
+            + "It may be registered later by a plugin.", s);
       }
     }
 
     for (Map.Entry<String, List<String>> entry : forcedHosts.getForcedHosts().entrySet()) {
       if (entry.getValue().isEmpty()) {
-        logger.error("Forced host '{}' does not contain any servers", entry.getKey());
-        valid = false;
+        logger.warn("Forced host '{}' does not contain any servers and will be ignored",
+            entry.getKey());
         continue;
       }
 
       for (String server : entry.getValue()) {
         if (!servers.getServers().containsKey(server)) {
-          logger.error("Server '{}' for forced host '{}' does not exist", server, entry.getKey());
-          valid = false;
+          logger.warn("Server '{}' for forced host '{}' is not registered in your configuration. "
+              + "It may be registered later by a plugin.", server, entry.getKey());
         }
       }
     }
@@ -650,7 +650,7 @@ public class VelocityConfiguration implements ProxyConfig {
           }
         }
         this.servers = ImmutableMap.copyOf(servers);
-        this.attemptConnectionOrder = config.getOrElse("try", attemptConnectionOrder);
+        this.attemptConnectionOrder = config.getOrElse("try", ImmutableList.of());
       }
     }
 

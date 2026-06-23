@@ -128,7 +128,11 @@ public final class ConnectionManager {
             if (future.isSuccess()) {
               this.endpoints.put(address, new Endpoint(channel, ListenerType.MINECRAFT));
 
-              LOGGER.info("Listening on {}", channel.localAddress());
+              if (binds == 1) {
+                LOGGER.info("Listening on {}", channel.localAddress());
+              } else if (finalBind == binds - 1) {
+                LOGGER.info("Listening on {} with {} channels", channel.localAddress(), binds);
+              }
 
               if (finalBind == 0) {
                 // Warn people with console access that HAProxy is in use, see PR: #1436
@@ -218,10 +222,15 @@ public final class ConnectionManager {
     // should have a chance to be notified before the server stops accepting connections.
     server.getEventManager().fire(new ListenerCloseEvent(oldBind, type)).join();
 
-    for (Endpoint endpoint : endpoints) {
-      Channel serverChannel = endpoint.getChannel();
-      LOGGER.info("Closing endpoint {}", serverChannel.localAddress());
-      serverChannel.close().syncUninterruptibly();
+    if (endpoints.size() == 1) {
+      Endpoint endpoint = endpoints.iterator().next();
+      LOGGER.info("Closing endpoint {}", endpoint.getChannel().localAddress());
+      endpoint.getChannel().close().syncUninterruptibly();
+    } else {
+      LOGGER.info("Closing endpoint {} with {} channels", oldBind, endpoints.size());
+      for (Endpoint endpoint : endpoints) {
+        endpoint.getChannel().close().syncUninterruptibly();
+      }
     }
   }
 
@@ -241,8 +250,12 @@ public final class ConnectionManager {
       // should have a chance to be notified before the server stops accepting connections.
       server.getEventManager().fire(new ListenerCloseEvent(address, type)).join();
 
-      for (Endpoint endpoint : endpoints) {
+      if (endpoints.size() == 1) {
         LOGGER.info("Closing endpoint {}", address);
+      } else {
+        LOGGER.info("Closing endpoint {} with {} channels", address, endpoints.size());
+      }
+      for (Endpoint endpoint : endpoints) {
         if (interrupt) {
           try {
             endpoint.getChannel().close().sync();
